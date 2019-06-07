@@ -19,7 +19,9 @@
     <script defer src="/__/firebase/6.1.1/firebase-storage.js"></script>
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
-
+    <script defer src="/__/firebase/6.1.1/firebase-firestore.js"></script>
+    <script defer src="/__/firebase/6.1.1/firebase-functions.js"></script>
+    
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
       #message { background: white; max-width: 450px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
@@ -33,6 +35,12 @@
         body { border-top: 16px solid #ffa100; }
       }
     </style>
+
+
+
+<script>
+
+</script>
   </head>
   <body>
     <div id="message">
@@ -51,17 +59,6 @@
    </div>
     <p id="load">Firebase SDK Loading&hellip;</p>
     
-    
-
-
-
-
-
-
-
-
-
-
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -76,22 +73,22 @@
             <form>
               <div class="form-group">
                 <label for="message-text" class="col-form-label">Questão:</label>
-                <textarea class="form-control" id="questao"></textarea>
+                <textarea class="form-control" id="inpquestao"></textarea>
               </div>
               <div class="form-group">
                   <label for="recipient-name" class="col-form-label">Resposta correta:</label>
-                  <input type="text" class="form-control" id="correta">
+                  <input type="text" class="form-control" id="inpcorreta">
                 </div>
                 <div class="form-group">
                     <label for="recipient-name" class="col-form-label">Resposta incorreta:</label>
-                    <input type="text" class="form-control" id="incorreta">
+                    <input type="text" class="form-control" id="inpincorreta">
                   </div>
                   As alternativas serão apresentadas aleatoriamente no Quiz.
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Send message</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-primary" id="btnSalvar">Inserir</button>
           </div>
         </div>
       </div>
@@ -100,6 +97,7 @@
 
 
     <script>
+     
       document.addEventListener('DOMContentLoaded', function() {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
@@ -110,7 +108,65 @@
         // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
         //
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // Read result of the Cloud Function.
+        // ...
 
+        var db = firebase.firestore();
+        
+   
+        var functions = firebase.functions();
+
+        
+// Inserindo questao na database
+
+$(document).ready(function () {
+  $("#btnSalvar").click(function (){
+    questao = document.getElementById("inpquestao").value;
+    correta = document.getElementById("inpcorreta").value;
+    errada = document.getElementById("inpincorreta").value;
+
+    var salvarQuestao = firebase.functions().httpsCallable('salvarQuestao');
+      salvarQuestao({questao: questao, correta: correta, errada: errada}).then(function(result) {
+      if(result == true)
+      $('#exampleModal').modal('hide');
+      
+      // ...
+    });
+  })
+})
+
+
+
+$(document).ready(function () {
+  $("#btnSalvar44444444").click(function (){
+    questao = document.getElementById("inpquestao").value;
+    respcorreta = document.getElementById("inpcorreta").value;
+    resperrada = document.getElementById("inpincorreta").value;
+          
+  db.collection("questoes").get().then(snap => {
+  size = snap.size // percebi que essa funçao nao pode ser usada qnd existe muitos dados..
+
+  db.collection("questoes").doc(size.toString()).set({
+  questao: questao,
+  respcorreta: respcorreta,
+  resperrada: resperrada
+  })
+  .then(function() {
+  console.log("Certo!");
+  $('#exampleModal').modal('hide');
+  //window.location.href = "index.html";
+  })
+  .catch(function(error) {
+  console.error("Erro: ", error);
+  });
+
+});
+            });
+ });
+         
+
+
+        // gerado pelo firebase \/
         try {
           let app = firebase.app();
           let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
@@ -120,6 +176,10 @@
           document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
         }
       });
+
+
+
+ 
     </script>
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
